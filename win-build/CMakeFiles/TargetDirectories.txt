@@ -1,4 +1,0 @@
-/home/kevin/encrypt/win-build/CMakeFiles/encrypt_decrypt_linux.dir
-/home/kevin/encrypt/win-build/CMakeFiles/encrypt_decrypt_windows.dir
-/home/kevin/encrypt/win-build/CMakeFiles/edit_cache.dir
-/home/kevin/encrypt/win-build/CMakeFiles/rebuild_cache.dir
