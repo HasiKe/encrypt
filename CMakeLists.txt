@@ -36,8 +36,11 @@ endif()
 
 # Toolchain nur für das Windows-Target anwenden
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/toolchain-mingw-w64.cmake")
-target_compile_options(encrypt_decrypt_windows PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-mwindows>)
-
+if(WIN32)
+    target_compile_options(encrypt_decrypt_windows PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-mwindows>)
+endif()
 # Header-Dateien einbinden
 target_include_directories(encrypt_decrypt_linux PRIVATE "${CMAKE_SOURCE_DIR}/src")
-target_include_directories(encrypt_decrypt_windows PRIVATE "${CMAKE_SOURCE_DIR}/src")
+if(WIN32)
+    target_include_directories(encrypt_decrypt_windows PRIVATE "${CMAKE_SOURCE_DIR}/src")
+endif()
