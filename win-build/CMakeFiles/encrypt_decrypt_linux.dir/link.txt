@@ -1,0 +1,3 @@
+/usr/bin/cmake -E rm -f CMakeFiles/encrypt_decrypt_linux.dir/objects.a
+/usr/bin/x86_64-w64-mingw32-ar qc CMakeFiles/encrypt_decrypt_linux.dir/objects.a @CMakeFiles/encrypt_decrypt_linux.dir/objects1.rsp
+/usr/bin/x86_64-w64-mingw32-g++  -static -static-libgcc -static-libstdc++ -Wl,--whole-archive CMakeFiles/encrypt_decrypt_linux.dir/objects.a -Wl,--no-whole-archive -o /home/kevin/encrypt/bin/Linux/encrypt_decrypt.exe -Wl,--out-implib,libencrypt_decrypt.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/encrypt_decrypt_linux.dir/linkLibs.rsp
