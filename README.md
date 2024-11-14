@@ -1,14 +1,19 @@
 ## deps
+```bash
 sudo apt install mingw-w64
-
+```
 ## Windows:
-mkdir build-win/
-cd build-win/
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-mingw-w64.cmake
-make
-
-## Linux
+```bash
 mkdir build
 cd build
-cmake ..
+cmake
 make
+```
+## USE
+```bash
+# Encrypt
+./encrypt Example.file Passwort
+
+# Decrypt
+./encrypt Example.cryp Passwort
+```

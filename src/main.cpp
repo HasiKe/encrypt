@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Entscheidung basierend auf der Dateierweiterung
-    if (extension == ".kev") {
+    if (extension == ".cryp") {
         if (!decryptFile(inputFile, password)) {
             showMessage("Fehler bei der Entschlüsselung der Datei.");
             return 1;
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
             showMessage("Datei erfolgreich entschlüsselt.");
         }
     } else {
-        std::string outputFile = name + ".kev";
+        std::string outputFile = name + ".cryp";
         if (!encryptFile(inputFile, outputFile, password)) {
             showMessage("Fehler bei der Verschlüsselung der Datei.");
             return 1;

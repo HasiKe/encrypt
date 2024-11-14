@@ -14,33 +14,23 @@ file(GLOB SRC_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 # Linux-Build konfigurieren
 add_executable(encrypt_decrypt_linux ${SRC_FILES})
 set_target_properties(encrypt_decrypt_linux PROPERTIES
-    OUTPUT_NAME "encrypt_decrypt"
+    OUTPUT_NAME "encrypt"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Linux"
 )
-
-# Windows-Build konfigurieren (unter Verwendung der Cross-Toolchain-Datei)
-if (WIN32)
-    add_executable(encrypt_decrypt_windows WIN32 ${SRC_FILES} ${CMAKE_SOURCE_DIR}/resources/resources.rc)
-    set_target_properties(encrypt_decrypt_windows PROPERTIES
-        OUTPUT_NAME "encrypt_decrypt"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Windows"
-    )
-endif()
-
-
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
-endif()
-
-
-# Toolchain nur für das Windows-Target anwenden
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/toolchain-mingw-w64.cmake")
-if(WIN32)
-    target_compile_options(encrypt_decrypt_windows PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-mwindows>)
-endif()
-# Header-Dateien einbinden
 target_include_directories(encrypt_decrypt_linux PRIVATE "${CMAKE_SOURCE_DIR}/src")
-if(WIN32)
-    target_include_directories(encrypt_decrypt_windows PRIVATE "${CMAKE_SOURCE_DIR}/src")
+
+# Windows-Build konfigurieren
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/toolchain-mingw-w64.cmake" CACHE STRING "Toolchain file for cross-compiling to Windows" FORCE)
+add_executable(encrypt_decrypt_windows WIN32 ${SRC_FILES} ${CMAKE_SOURCE_DIR}/resources/resources.rc)
+set_target_properties(encrypt_decrypt_windows PROPERTIES
+    OUTPUT_NAME "encrypt.exe"  # Setzt die Ausgabe explizit auf .exe
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Windows"
+)
+target_include_directories(encrypt_decrypt_windows PRIVATE "${CMAKE_SOURCE_DIR}/src")
+
+# Statische Kompilierung sicherstellen
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND "${CMAKE_CXX_COMPILER}" MATCHES ".*mingw.*")
+    # Statische Verlinkung aller Standardbibliotheken und Ressourcen
+    target_compile_options(encrypt_decrypt_windows PRIVATE -static -static-libgcc -static-libstdc++ -mwindows)
+    target_link_options(encrypt_decrypt_windows PRIVATE -static -static-libgcc -static-libstdc++)
 endif()
