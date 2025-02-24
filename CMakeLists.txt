@@ -17,7 +17,7 @@ set_target_properties(encrypt_decrypt_linux PROPERTIES
     OUTPUT_NAME "encrypt"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Linux"
 )
-target_include_directories(encrypt_decrypt_linux PRIVATE "${CMAKE_SOURCE_DIR}/src")
+target_include_directories(encrypt_decrypt_linux PRIVATE "${CMAKE_SOURCE_DIR}/include")
 
 # Windows-Build konfigurieren
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/toolchain-mingw-w64.cmake" CACHE STRING "Toolchain file for cross-compiling to Windows" FORCE)
