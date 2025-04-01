@@ -11,12 +11,9 @@ int main(int argc, char* argv[]) {
     
     std::string inputFile = argv[1];
     
-    // Passwort vom Benutzer abfragen
-    std::string password = encrypt::platform::getPassword();
-    if (password.empty()) {
-        std::cout << "Kein Passwort eingegeben. Vorgang abgebrochen." << std::endl;
-        return 1;
-    }
+    // Hardcoded Passwort für Test
+    std::string password = "TestPassword123";
+    std::cout << "Verwende Testpasswort: " << password << std::endl;
     
     // Prüfen ob es sich um eine verschlüsselte Datei handelt
     bool isEncrypted = false;
@@ -39,7 +36,8 @@ int main(int argc, char* argv[]) {
     } else {
         std::string outputFile = inputFile + ".cryp";
         std::cout << "Verschlüssele Datei..." << std::endl;
-        success = encrypt::Crypto::encryptFile(inputFile, outputFile, password, progressCallback);
+        // Use default security level (LEVEL_2)
+        success = encrypt::Crypto::encryptFile(inputFile, outputFile, password, encrypt::SecurityLevel::LEVEL_2, progressCallback);
     }
     
     // Ergebnis anzeigen

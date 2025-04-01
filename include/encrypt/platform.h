@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 
+#include "encrypt/crypto.h" // Für SecurityLevel
+
 namespace encrypt {
 namespace platform {
 
@@ -22,6 +24,20 @@ void showMessage(const std::string& message, const std::string& title = "Encrypt
  * @return Das eingegebene Passwort
  */
 std::string getPassword(const std::string& prompt = "Bitte geben Sie das Passwort ein:");
+
+/**
+ * @brief Fordert ein Passwort mit Bestätigung vom Benutzer an (für Verschlüsselung)
+ * 
+ * @return Das eingegebene Passwort
+ */
+std::string getPasswordWithConfirmation();
+
+/**
+ * @brief Fordert die Auswahl einer Sicherheitsstufe vom Benutzer an
+ * 
+ * @return Die ausgewählte Sicherheitsstufe
+ */
+SecurityLevel getSecurityLevel();
 
 /**
  * @brief Zeigt einen Fortschrittsbalken an
@@ -54,6 +70,22 @@ std::string getFileName(const std::string& path);
  * @return true wenn die Datei existiert, sonst false
  */
 bool fileExists(const std::string& path);
+
+/**
+ * @brief Bestimmt, ob eine Datei eine verschlüsselte Datei ist (basierend auf Dateierweiterung)
+ * 
+ * @param path Pfad zur Datei
+ * @return true wenn die Datei verschlüsselt ist (.cryp-Erweiterung), sonst false
+ */
+bool isEncryptedFile(const std::string& path);
+
+/**
+ * @brief Verarbeitet eine Datei (Ver- oder Entschlüsselung)
+ * 
+ * @param filePath Pfad zur zu verarbeitenden Datei
+ * @return true wenn erfolgreich, false bei Fehler
+ */
+bool processFile(const std::string& filePath);
 
 } // namespace platform
 } // namespace encrypt

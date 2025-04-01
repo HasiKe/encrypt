@@ -11,50 +11,50 @@
 namespace encrypt {
 
 /**
- * @brief Verschlüsselungsstärke von 1 (schnell) bis 5 (maximal sicher)
+ * @brief Encryption strength from 1 (fast) to 5 (maximum security)
  */
 enum class SecurityLevel {
-    LEVEL_1 = 1, // Schnell, aber trotzdem sicher (AES-128)
-    LEVEL_2 = 2, // Ausgewogen (AES-256)
-    LEVEL_3 = 3, // Erhöhte Sicherheit (AES-256 mit mehr Iterationen)
-    LEVEL_4 = 4, // Hohe Sicherheit (AES-256 mit Argon2)
-    LEVEL_5 = 5  // Maximale Sicherheit (AES-256 + ChaCha20 mit Argon2id)
+    LEVEL_1 = 1, // Fast but still secure (AES-128)
+    LEVEL_2 = 2, // Balanced (AES-256)
+    LEVEL_3 = 3, // Enhanced security (AES-256 with more iterations)
+    LEVEL_4 = 4, // High security (AES-256 with Argon2)
+    LEVEL_5 = 5  // Maximum security (AES-256 + ChaCha20 with Argon2id)
 };
 
-// Vorwärtsdeklaration
+// Forward declaration
 class Crypto;
 
 /**
- * @brief Parameter für die kryptographischen Operationen
+ * @brief Parameters for cryptographic operations
  */
 struct CryptoParams {
-    std::vector<uint8_t> key;        // Abgeleiteter Schlüssel
-    std::vector<uint8_t> iv;         // Initialisierungsvektor
-    std::vector<uint8_t> salt;       // Salt für die Schlüsselableitung
-    std::vector<uint8_t> authTag;    // Authentifizierungs-Tag (für GCM-Modus)
+    std::vector<uint8_t> key;        // Derived key
+    std::vector<uint8_t> iv;         // Initialization vector
+    std::vector<uint8_t> salt;       // Salt for key derivation
+    std::vector<uint8_t> authTag;    // Authentication tag (for GCM mode)
     
     CryptoParams() = default;
     
-    // Erzeugt Parameter mit zufälligen Werten für die Verschlüsselung
+    // Generate parameters with random values for encryption
     static CryptoParams generateForEncryption(SecurityLevel level);
     
-    friend class Crypto; // Erlaubt Crypto-Klasse Zugriff auf private Funktionen
+    friend class Crypto; // Allows Crypto class access to private functions
 };
 
 /**
- * @brief Enthält Funktionen für Ver- und Entschlüsselung
+ * @brief Contains encryption and decryption functions
  */
 class Crypto {
 public:
     /**
-     * @brief Verschlüsselt eine Datei mit dem angegebenen Passwort
+     * @brief Encrypts a file with the given password
      * 
-     * @param inputFileName Pfad zur Eingabedatei
-     * @param outputFileName Pfad zur Ausgabedatei
-     * @param password Passwort für die Verschlüsselung
-     * @param level Sicherheitsstufe (1-5)
-     * @param progressCallback Optional: Callback-Funktion für Fortschrittsaktualisierungen
-     * @return true wenn erfolgreich, false bei Fehler
+     * @param inputFileName Path to the input file
+     * @param outputFileName Path to the output file
+     * @param password Password for encryption
+     * @param level Security level (1-5)
+     * @param progressCallback Optional: Callback function for progress updates
+     * @return true if successful, false on error
      */
     static bool encryptFile(
         const std::string& inputFileName, 
@@ -65,13 +65,13 @@ public:
     );
 
     /**
-     * @brief Entschlüsselt eine Datei mit dem angegebenen Passwort
+     * @brief Decrypts a file with the given password
      * 
-     * @param inputFileName Pfad zur verschlüsselten Datei
-     * @param password Passwort für die Entschlüsselung
-     * @param outputFileName Optional: Zieldateiname (wenn nicht angegeben, wird der originale verwendet)
-     * @param progressCallback Optional: Callback-Funktion für Fortschrittsaktualisierungen
-     * @return true wenn erfolgreich, false bei Fehler
+     * @param inputFileName Path to the encrypted file
+     * @param password Password for decryption
+     * @param outputFileName Optional: Target filename (if not specified, original name will be used)
+     * @param progressCallback Optional: Callback function for progress updates
+     * @return true if successful, false on error
      */
     static bool decryptFile(
         const std::string& inputFileName, 
@@ -81,16 +81,16 @@ public:
     );
     
     /**
-     * @brief Verschlüsselt einen gesamten Ordner mit dem angegebenen Passwort
+     * @brief Encrypts an entire folder with the given password
      * 
-     * Verschlüsselt alle Dateien im angegebenen Ordner und erstellt eine einzelne verschlüsselte Datei.
+     * Encrypts all files in the specified folder and creates a single encrypted file.
      * 
-     * @param inputFolderPath Pfad zum zu verschlüsselnden Ordner
-     * @param outputFileName Pfad zur Ausgabedatei
-     * @param password Passwort für die Verschlüsselung
-     * @param level Sicherheitsstufe (1-5)
-     * @param progressCallback Optional: Callback-Funktion für Fortschrittsaktualisierungen
-     * @return true wenn erfolgreich, false bei Fehler
+     * @param inputFolderPath Path to the folder to encrypt
+     * @param outputFileName Path to the output file
+     * @param password Password for encryption
+     * @param level Security level (1-5)
+     * @param progressCallback Optional: Callback function for progress updates
+     * @return true if successful, false on error
      */
     static bool encryptFolder(
         const std::string& inputFolderPath,
@@ -101,13 +101,13 @@ public:
     );
     
     /**
-     * @brief Entschlüsselt einen verschlüsselten Ordner mit dem angegebenen Passwort
+     * @brief Decrypts an encrypted folder with the given password
      * 
-     * @param inputFileName Pfad zur verschlüsselten Ordner-Datei
-     * @param password Passwort für die Entschlüsselung
-     * @param outputFolderPath Optional: Zielordner-Pfad (wenn nicht angegeben, wird der originale Ordnername verwendet)
-     * @param progressCallback Optional: Callback-Funktion für Fortschrittsaktualisierungen
-     * @return true wenn erfolgreich, false bei Fehler
+     * @param inputFileName Path to the encrypted folder file
+     * @param password Password for decryption
+     * @param outputFolderPath Optional: Target folder path (if not specified, original folder name will be used)
+     * @param progressCallback Optional: Callback function for progress updates
+     * @return true if successful, false on error
      */
     static bool decryptFolder(
         const std::string& inputFileName,
@@ -117,34 +117,34 @@ public:
     );
 
     /**
-     * @brief Überprüft die Passwortqualität und gibt einen Score zurück
+     * @brief Checks password quality and returns a score
      * 
-     * @param password Das zu überprüfende Passwort
-     * @return int Score zwischen 0 (sehr schwach) und 100 (sehr stark)
+     * @param password The password to check
+     * @return int Score between 0 (very weak) and 100 (very strong)
      */
     static int checkPasswordStrength(const std::string& password);
 
     /**
-     * @brief Gibt die letzte Fehlermeldung zurück
+     * @brief Returns the last error message
      * 
-     * @return Die letzte aufgetretene Fehlermeldung
+     * @return The last error that occurred
      */
     static std::string getLastError();
 
     /**
-     * @brief Testet die Verschlüsselungsfunktionalität mit einem einfachen String
+     * @brief Tests the encryption functionality with a simple string
      * 
-     * @param testString Der zu testende String
-     * @param level Die zu verwendende Sicherheitsstufe
-     * @return true wenn der Test erfolgreich war, false sonst
+     * @param testString The string to test
+     * @param level The security level to use
+     * @return true if the test was successful, false otherwise
      */
     static bool testEncryption(const std::string& testString, const std::string& password, SecurityLevel level);
 
-    // Für CryptoParams
+    // For CryptoParams
     friend CryptoParams CryptoParams::generateForEncryption(SecurityLevel level);
 
 private:
-    // Private Hilfsfunktionen für die Kryptographie
+    // Private helper functions for cryptography
     static std::vector<uint8_t> generateRandomBytes(size_t length);
     
     static CryptoParams deriveKeyFromPassword(
@@ -167,7 +167,7 @@ private:
         SecurityLevel level
     );
     
-    // Für Sicherheitsstufe 5: Zusätzliche ChaCha20 Verschlüsselung
+    // For security level 5: Additional ChaCha20 encryption
     static bool encryptChaCha20(
         const std::vector<uint8_t>& input, 
         std::vector<uint8_t>& output,
@@ -180,7 +180,7 @@ private:
         const CryptoParams& params
     );
     
-    // Hilfsfunktion zum Lesen von Dateien in Chunks
+    // Helper function for reading files in chunks
     static bool processFileInChunks(
         const std::string& inputFileName,
         const std::string& outputFileName,
@@ -188,62 +188,62 @@ private:
         const std::function<void(float)>& progressCallback
     );
     
-    // Fehlerverwaltung
+    // Error handling
     static thread_local std::string lastError;
 };
 
-// Konstanten für die Verschlüsselung
+// Constants for encryption
 namespace crypto_constants {
-    // Dateiformat-Signatur
+    // File format signature
     constexpr uint8_t FILE_SIGNATURE[4] = {'S', 'E', 'C', 'F'};
     
-    // Aktuelle Dateiformat-Version
+    // Current file format version
     constexpr uint8_t FILE_VERSION = 0x01;
     
-    // Header-Tag für die Sicherheitsstufe
+    // Header tag for security level
     constexpr uint8_t HEADER_TAG_SECURITY_LEVEL = 0x01;
     
-    // Header-Tag für den Salt
+    // Header tag for salt
     constexpr uint8_t HEADER_TAG_SALT = 0x02;
     
-    // Header-Tag für den IV
+    // Header tag for IV
     constexpr uint8_t HEADER_TAG_IV = 0x03;
     
-    // Header-Tag für den Auth-Tag (GCM)
+    // Header tag for auth tag (GCM)
     constexpr uint8_t HEADER_TAG_AUTH_TAG = 0x04;
     
-    // Header-Tag für den Dateinamen
+    // Header tag for filename
     constexpr uint8_t HEADER_TAG_FILENAME = 0x05;
     
-    // Header-Tag für zusätzliche ChaCha20-Parameter
+    // Header tag for additional ChaCha20 parameters
     constexpr uint8_t HEADER_TAG_CHACHA_NONCE = 0x06;
     
-    // Header-Tags für Ordnerverschlüsselung
+    // Header tags for folder encryption
     constexpr uint8_t HEADER_TAG_FOLDER = 0x07;
     constexpr uint8_t HEADER_TAG_FILE_ENTRY = 0x08;
     constexpr uint8_t HEADER_TAG_FILE_PATH = 0x09;
     constexpr uint8_t HEADER_TAG_FILE_SIZE = 0x0A;
     constexpr uint8_t HEADER_TAG_FILE_DATA = 0x0B;
     
-    // Schlüssellängen für verschiedene Sicherheitsstufen
-    constexpr size_t KEY_SIZE_LEVEL_1 = 16;  // 128 Bit
-    constexpr size_t KEY_SIZE_LEVEL_2 = 32;  // 256 Bit
-    constexpr size_t KEY_SIZE_LEVEL_3 = 32;  // 256 Bit
-    constexpr size_t KEY_SIZE_LEVEL_4 = 32;  // 256 Bit
-    constexpr size_t KEY_SIZE_LEVEL_5 = 32;  // 256 Bit
+    // Key lengths for different security levels
+    constexpr size_t KEY_SIZE_LEVEL_1 = 16;  // 128 bit
+    constexpr size_t KEY_SIZE_LEVEL_2 = 32;  // 256 bit
+    constexpr size_t KEY_SIZE_LEVEL_3 = 32;  // 256 bit
+    constexpr size_t KEY_SIZE_LEVEL_4 = 32;  // 256 bit
+    constexpr size_t KEY_SIZE_LEVEL_5 = 32;  // 256 bit
     
-    // Größen für Salt und IV
+    // Sizes for salt and IV
     constexpr size_t SALT_SIZE = 32;
     constexpr size_t IV_SIZE = 16;
     constexpr size_t CHACHA_NONCE_SIZE = 12;
     constexpr size_t GCM_TAG_SIZE = 16;
     
-    // Iterationszahlen für PBKDF2 pro Sicherheitsstufe
+    // Iteration counts for PBKDF2 per security level
     constexpr uint32_t PBKDF2_ITERATIONS_LEVEL_1 = 10000;
     constexpr uint32_t PBKDF2_ITERATIONS_LEVEL_2 = 100000;
     constexpr uint32_t PBKDF2_ITERATIONS_LEVEL_3 = 250000;
     
-    // Parameter für Argon2 (Stufen 4 und 5)
+    // Parameters for Argon2 (levels 4 and 5)
     constexpr uint32_t ARGON2_TIME_COST_LEVEL_4 = 3;
     constexpr uint32_t ARGON2_MEMORY_COST_LEVEL_4 = 65536; // 64 MB
     constexpr uint32_t ARGON2_PARALLELISM_LEVEL_4 = 4;

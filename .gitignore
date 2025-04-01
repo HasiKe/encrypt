@@ -2,3 +2,4 @@ build/
 build-win/
 bin/
 .vscode/
+build_windows/

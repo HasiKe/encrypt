@@ -7,10 +7,12 @@ namespace ui {
 }
 }
 
+#ifndef _WIN32
 /**
- * @brief Haupteinstiegspunkt der Anwendung
+ * @brief Haupteinstiegspunkt der Anwendung für nicht-Windows-Plattformen
  * 
  * Diese Funktion leitet die Programmargumente an die UI-Implementierung weiter.
+ * Für Windows wird stattdessen WinMain in der windows.cpp Datei verwendet.
  * 
  * @param argc Anzahl der Kommandozeilenargumente
  * @param argv Array der Kommandozeilenargumente
@@ -27,3 +29,4 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 }
+#endif
