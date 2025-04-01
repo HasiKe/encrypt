@@ -764,12 +764,28 @@ bool Crypto::encryptFile(
         
         // Leite Schlüssel vom Passwort ab
         std::cerr << "DEBUG: Deriving key from password" << std::endl;
-        params = deriveKeyFromPassword(password, params.salt, level);
-        if (params.key.empty()) {
+        std::cerr << "DEBUG: Original IV size before key derivation: " << params.iv.size() << " bytes" << std::endl;
+        
+        // Speichere IV, da deriveKeyFromPassword diese überschreiben kann
+        std::vector<uint8_t> savedIV = params.iv;
+        
+        // Leite den Schlüssel ab
+        CryptoParams keyParams = deriveKeyFromPassword(password, params.salt, level);
+        if (keyParams.key.empty()) {
             // Fehlermeldung wurde bereits in deriveKeyFromPassword gesetzt
             std::cerr << "DEBUG: Key derivation failed: " << lastError << std::endl;
             return false;
         }
+        
+        // Übernimm nur den Schlüssel, behalte den IV
+        params.key = keyParams.key;
+        
+        // Stelle sicher, dass der IV nicht verloren geht
+        if (params.iv.empty() && !savedIV.empty()) {
+            params.iv = savedIV;
+        }
+        
+        std::cerr << "DEBUG: IV size after key derivation: " << params.iv.size() << " bytes" << std::endl;
         
         // Öffne die Ausgabedatei
         std::cerr << "DEBUG: Opening output file" << std::endl;
@@ -833,6 +849,9 @@ bool Crypto::encryptFile(
             std::vector<uint8_t> fileNameBytes(fileName.begin(), fileName.end());
             std::vector<uint8_t> encryptedFileName;
             
+            // Temporäre Kopie des Auth-Tags sichern
+            std::vector<uint8_t> savedAuthTag = params.authTag;
+            
             if (!encryptAES(fileNameBytes, encryptedFileName, params, level)) {
                 std::cerr << "DEBUG: Failed to encrypt filename: " << lastError << std::endl;
                 return false;
@@ -845,11 +864,16 @@ bool Crypto::encryptFile(
             outputFile.write(reinterpret_cast<const char*>(&fileNameSize), sizeof(fileNameSize));
             outputFile.write(reinterpret_cast<const char*>(encryptedFileName.data()), encryptedFileName.size());
             
-            // Write the GCM authentication tag
-            std::cerr << "DEBUG: Writing auth tag" << std::endl;
+            // Write the GCM authentication tag for filename
+            std::cerr << "DEBUG: Writing auth tag for filename" << std::endl;
             outputFile.put(HEADER_TAG_AUTH_TAG);
             outputFile.put(static_cast<char>(params.authTag.size()));
             outputFile.write(reinterpret_cast<const char*>(params.authTag.data()), params.authTag.size());
+            
+            // Restore the original authTag if any
+            if (!savedAuthTag.empty()) {
+                params.authTag = std::move(savedAuthTag);
+            }
         } catch (const std::exception& e) {
             std::cerr << "DEBUG: Exception during filename processing: " << e.what() << std::endl;
             lastError = "Fehler bei der Verarbeitung des Dateinamens: ";
@@ -865,11 +889,14 @@ bool Crypto::encryptFile(
             std::cerr << "DEBUG: Processing file in chunks" << std::endl;
             
             // Verarbeite die Datei in Chunks
-            auto processor = [&params, level](const std::vector<uint8_t>& input, std::vector<uint8_t>& output) -> bool {
+            // Kopie der Parameter, um nicht mit den originalen zu arbeiten
+            CryptoParams processorParams = params;
+
+            auto processor = [processorParams, level](const std::vector<uint8_t>& input, std::vector<uint8_t>& output) mutable -> bool {
                 std::cerr << "DEBUG: Processing chunk of size " << input.size() << std::endl;
                 
                 // Verschlüssele mit AES
-                if (!Crypto::encryptAES(input, output, params, level)) {
+                if (!Crypto::encryptAES(input, output, processorParams, level)) {
                     std::cerr << "DEBUG: AES encryption failed: " << Crypto::getLastError() << std::endl;
                     return false;
                 }
@@ -877,7 +904,7 @@ bool Crypto::encryptFile(
                 // Für Sicherheitsstufe 5: Zusätzliche ChaCha20-Verschlüsselung
                 if (level == SecurityLevel::LEVEL_5) {
                     std::vector<uint8_t> chacha20Output;
-                    if (!Crypto::encryptChaCha20(output, chacha20Output, params)) {
+                    if (!Crypto::encryptChaCha20(output, chacha20Output, processorParams)) {
                         std::cerr << "DEBUG: ChaCha20 encryption failed: " << Crypto::getLastError() << std::endl;
                         return false;
                     }
@@ -886,7 +913,7 @@ bool Crypto::encryptFile(
                 
                 // Füge den Auth-Tag hinzu
                 std::vector<uint8_t> withTag = output;
-                withTag.insert(withTag.end(), params.authTag.begin(), params.authTag.end());
+                withTag.insert(withTag.end(), processorParams.authTag.begin(), processorParams.authTag.end());
                 output = std::move(withTag);
                 
                 return true;
@@ -1071,14 +1098,27 @@ bool Crypto::decryptFile(
     params.iv = iv;
     params.authTag = authTag;
     
-    params = deriveKeyFromPassword(password, salt, level);
-    if (params.key.empty()) {
+    // Sichern des IVs, da dieser bei deriveKeyFromPassword verloren gehen könnte
+    std::vector<uint8_t> savedIV = iv;
+    
+    // Schüssel vom Passwort ableiten
+    CryptoParams keyParams = deriveKeyFromPassword(password, salt, level);
+    if (keyParams.key.empty()) {
         // Fehlermeldung wurde bereits in deriveKeyFromPassword gesetzt
         return false;
     }
     
-    // Auth-Tag für Dateinamen zurück in Parameter setzen
-    params.authTag = authTag;
+    // Nur den Schlüssel übernehmen, IV und authTag behalten
+    params.key = keyParams.key;
+    
+    // Sicherstellen, dass IV nicht verloren geht
+    if (params.iv.empty() && !savedIV.empty()) {
+        params.iv = savedIV;
+    }
+    
+    std::cerr << "DEBUG: Decryption key derived, key size: " << params.key.size() 
+              << ", IV size: " << params.iv.size() 
+              << ", auth tag size: " << params.authTag.size() << std::endl;
     
     // Dateinamen entschlüsseln
     std::vector<uint8_t> decryptedFileNameBytes;
@@ -1209,16 +1249,37 @@ bool Crypto::testEncryption(const std::string& testString, const std::string& pa
         std::vector<uint8_t> input(testString.begin(), testString.end());
         std::vector<uint8_t> output;
         
-        // Generate crypto params and derive key
-        CryptoParams params = CryptoParams::generateForEncryption(level);
-        params = deriveKeyFromPassword(password, params.salt, level);
+        // Manuell Crypto-Parameter erstellen
+        CryptoParams params;
+        
+        // Salt und IV erzeugen
+        std::cerr << "DEBUG: Generating random bytes for salt and IV" << std::endl;
+        std::vector<uint8_t> salt = generateRandomBytes(SALT_SIZE);
+        std::vector<uint8_t> iv = generateRandomBytes(IV_SIZE);
+        
+        std::cerr << "DEBUG: Created salt (size: " << salt.size() << " bytes)" << std::endl;
+        std::cerr << "DEBUG: Created IV (size: " << iv.size() << " bytes)" << std::endl;
+        
+        // Parameter manuell setzen
+        params.salt = salt;
+        params.iv = iv;
+        
+        // Leite Schlüssel vom Passwort ab
+        std::cerr << "DEBUG: Deriving key from password" << std::endl;
+        CryptoParams keyParams = deriveKeyFromPassword(password, params.salt, level);
+        params.key = keyParams.key;
         
         if (params.key.empty()) {
             std::cerr << "DEBUG: Key derivation failed: " << lastError << std::endl;
             return false;
         }
         
+        std::cerr << "DEBUG: Key derived successfully (size: " << params.key.size() << " bytes)" << std::endl;
+        std::cerr << "DEBUG: Salt size: " << params.salt.size() << " bytes" << std::endl;
+        std::cerr << "DEBUG: IV size: " << params.iv.size() << " bytes" << std::endl;
+        
         // Encrypt the string
+        std::cerr << "DEBUG: Encrypting test string" << std::endl;
         bool success = encryptAES(input, output, params, level);
         
         if (!success) {
@@ -1227,8 +1288,10 @@ bool Crypto::testEncryption(const std::string& testString, const std::string& pa
         }
         
         std::cerr << "DEBUG: Successfully encrypted test string" << std::endl;
+        std::cerr << "DEBUG: Auth tag size: " << params.authTag.size() << " bytes" << std::endl;
         
         // Now decrypt it
+        std::cerr << "DEBUG: Decrypting test string" << std::endl;
         std::vector<uint8_t> decrypted;
         success = decryptAES(output, decrypted, params, level);
         

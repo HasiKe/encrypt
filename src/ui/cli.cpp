@@ -242,17 +242,13 @@ int run(int argc, char* argv[]) {
     bool success = false;
     
     try {
-        // Simple test to verify basic functionality - encrypt & decrypt a string
-        std::cerr << "Testing simple string encryption instead of file encryption" << std::endl;
-        std::string testString = "This is a test string for encryption";
+        // Nachdem der Encryption-Test erfolgreich war, können wir jetzt auch die Datei-Verschlüsselung nutzen
+        std::cerr << "Starte Datei-Verschlüsselung" << std::endl;
         
-        // Run the test
-        success = Crypto::testEncryption(testString, password, level);
-        
-        if (!success) {
-            std::cerr << "Encryption test failed: " << Crypto::getLastError() << std::endl;
-            platform::showMessage("Encryption test failed: " + Crypto::getLastError(), "Fehler");
-            return 1;
+        if (decrypt) {
+            success = Crypto::decryptFile(inputFile, password, outputFile, progressCallback);
+        } else {
+            success = Crypto::encryptFile(inputFile, outputFile, password, level, progressCallback);
         }
     } catch (const std::exception& e) {
         std::cerr << "EXCEPTION: " << e.what() << std::endl;
