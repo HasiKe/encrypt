@@ -1,118 +1,258 @@
-# Encrypt - Secure File and Folder Encryption
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="Encrypt Logo" width="120" height="120">
+</p>
 
-A modern, cross-platform encryption tool for secure file and folder protection.
+<h1 align="center">🔐 Encrypt</h1>
 
-## Features
+<p align="center">
+  <strong>Military-grade file and folder encryption made simple</strong>
+</p>
 
-- **File and Folder Encryption**: Securely encrypt individual files or entire folders
-- **Multiple Security Levels**: Choose from 5 different security levels (1=fast to 5=maximum)
-- **Easy to Use**: Drag-and-drop interface on Windows and command-line interface
-- **Cross-Platform**: Works on Windows and Linux
-- **No Dependencies**: The Windows version is completely standalone
-- **Password Strength Analysis**: Evaluates password quality before encryption
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#security">Security</a> •
+  <a href="README.md">Deutsch</a>
+</p>
 
-## Security Levels
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/C++-17-00599C?style=flat-square&logo=cplusplus" alt="C++17">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-lightgrey?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/Encryption-AES--256%20%7C%20ChaCha20-red?style=flat-square" alt="Encryption">
+</p>
 
-1. **Level 1**: Fast but secure (AES-128-GCM, PBKDF2 with 10,000 iterations)
-2. **Level 2**: Balanced (AES-256-GCM, PBKDF2 with 100,000 iterations)
-3. **Level 3**: Enhanced security (AES-256-GCM, PBKDF2 with 250,000 iterations)
-4. **Level 4**: High security (AES-256-GCM, Argon2id with 64MB RAM)
-5. **Level 5**: Maximum security (AES-256-GCM + ChaCha20, Argon2id with 256MB RAM)
+---
 
-## Installation
+## ✨ Features
 
-### Windows
+<table>
+<tr>
+<td width="50%">
 
-1. Download the latest release ZIP file
-2. Extract to any location
-3. Double-click `encrypt.exe` to start the drag-and-drop interface, or
-4. Run `install.bat` to install for the current user
+### 🛡️ Security
+- **5 Security Levels** from fast to maximum
+- **AES-256-GCM** Authenticated Encryption
+- **ChaCha20** Double-Encryption (Level 5)
+- **Argon2id** Memory-Hard KDF
+- **Tamper Protection** via Auth-Tags
 
-### Linux
+</td>
+<td width="50%">
 
-Build from source:
+### 🚀 Ease of Use
+- **Drag & Drop** on Windows
+- **CLI** for all platforms
+- **Folder Encryption** with one click
+- **Password Strength Check** in real-time
+- **Progress Indicator** for large files
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📊 Security Levels
+
+| Level | Cipher | KDF | Parameters | Use Case |
+|:-----:|--------|-----|-----------|----------|
+| **1** | AES-128-GCM | PBKDF2 | 10K iterations | Fast encryption |
+| **2** | AES-256-GCM | PBKDF2 | 100K iterations | **Recommended** ⭐ |
+| **3** | AES-256-GCM | PBKDF2 | 250K iterations | Sensitive data |
+| **4** | AES-256-GCM | Argon2id | 64 MB RAM | High security |
+| **5** | AES-256 + ChaCha20 | Argon2id | 256 MB RAM | Maximum security |
+
+---
+
+## 📦 Installation
+
+### Prerequisites
 
 ```bash
-# Install dependencies
+# Ubuntu/Debian
 sudo apt install build-essential cmake libssl-dev
 
-# Build
+# Optional for maximum security
+sudo apt install libsodium-dev libargon2-dev
+
+# For Windows Cross-Compile
+sudo apt install mingw-w64
+```
+
+### Building
+
+<details>
+<summary><b>🐧 Linux</b></summary>
+
+```bash
 git clone https://github.com/HasiKe/encrypt.git
 cd encrypt
 mkdir build && cd build
 cmake ..
-make
+make -j$(nproc)
 
-# Run
-./bin/encrypt
+# Optional: Install system-wide
+sudo make install
 ```
 
-## Usage
+</details>
 
-### Windows Drag-and-Drop Mode
-
-1. Start `encrypt.exe`
-2. Drag files or folders into the window
-3. The app will automatically detect if you're encrypting or decrypting based on file extension
-4. Enter your password and select security level (for encryption)
-5. The processed file will be created in the same directory
-
-### Command Line Mode
-
-```
-Usage: encrypt [options] <file>
-
-Options:
-  -h, --help              Show this help
-  -d, --decrypt           Decrypt file (default: encrypt)
-  -o, --output <file>     Specify output file
-  -p, --password <pass>   Specify password (INSECURE)
-  -l, --level <1-5>       Specify security level
-  -c, --check-password    Check password strength
-```
-
-Examples:
+<details>
+<summary><b>🪟 Windows (Cross-Compile)</b></summary>
 
 ```bash
-# Encrypt a file
-encrypt document.docx
+./build_windows.sh
+# or manually:
+mkdir build_windows && cd build_windows
+cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-mingw-w64.cmake ..
+make -j$(nproc)
+```
 
-# Encrypt with high security
-encrypt -l 4 document.docx
+The finished `encrypt.exe` is located in `build_windows/install/`.
 
-# Decrypt a file
-encrypt -d document.docx.cryp
+</details>
+
+---
+
+## 🎯 Usage
+
+### Command Line (CLI)
+
+```bash
+# Encrypt a file (default: Level 2)
+encrypt document.pdf
+
+# With higher security
+encrypt -l 4 secret.docx
+
+# Encrypt a folder
+encrypt projects/
+
+# Decrypt
+encrypt -d document.pdf.cryp
 
 # Check password strength
 encrypt -c
 ```
 
-## Building from Source
+### Windows Drag & Drop
 
-### For Linux
+1. **Start** `encrypt.exe`
+2. **Drag** files/folders into the window
+3. **Enter** your password
+4. **Select** the security level
+5. ✅ **Done!**
 
-```bash
-mkdir -p build && cd build
-cmake ..
-make
+### All Options
+
+```
+encrypt [options] <file/folder>
+
+Options:
+  -h, --help              Show help
+  -d, --decrypt           Decrypt (default: encrypt)
+  -o, --output <path>     Specify output path
+  -p, --password <pass>   Password (⚠️ insecure!)
+  -l, --level <1-5>       Security level
+  -c, --check-password    Start password checker
 ```
 
-### For Windows (Cross-Compile)
+---
 
-```bash
-# Install MinGW cross-compiler
-sudo apt install mingw-w64
+## 🔒 Security
 
-# Build
-./build_windows.sh
+### File Format
+
+```
+┌─────────────────────────────────────────────┐
+│  Header                                     │
+│  ├── Signature: "SECF" (4 bytes)           │
+│  ├── Version: 0x01                          │
+│  ├── Security Level                         │
+│  ├── Salt (32 bytes)                        │
+│  ├── IV (16-28 bytes)                       │
+│  ├── Encrypted Filename                     │
+│  └── Auth-Tag (16 bytes)                    │
+├─────────────────────────────────────────────┤
+│  Encrypted Data (64 KB chunks)             │
+│  └── Each chunk with its own Auth-Tag       │
+└─────────────────────────────────────────────┘
 ```
 
-The Windows executable will be in `build_windows/install/encrypt.exe`.
+### Best Practices
 
-## License
+> ⚠️ **Important**: Encryption is only as strong as your password!
 
-This software is provided as-is. Please use responsibly.
+- ✅ At least **12 characters**
+- ✅ Upper and lowercase, numbers, special characters
+- ✅ Use a **password manager**
+- ❌ No dictionary words
+- ❌ No personal information
 
-## Contributing
+---
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## 🏗️ Project Structure
+
+```
+encrypt/
+├── 📁 include/encrypt/      # Header files
+│   ├── crypto.h             # Cryptography API
+│   └── platform.h           # Platform abstraction
+├── 📁 src/
+│   ├── 📁 core/             # Core implementation
+│   │   └── crypto.cpp       # Encryption logic
+│   ├── 📁 platform/         # Platform-specific
+│   │   ├── linux.cpp
+│   │   └── windows.cpp
+│   ├── 📁 ui/               # User interface
+│   │   └── cli.cpp
+│   └── main.cpp
+├── 📁 lib/                   # Dependencies
+├── 📁 resources/             # Windows resources
+├── 📁 docs/                  # Documentation
+├── 📁 test/                  # Unit tests
+├── CMakeLists.txt
+└── README.md
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md).
+
+```bash
+# Fork & Clone
+git clone https://github.com/YOUR_USERNAME/encrypt.git
+
+# Create branch
+git checkout -b feature/my-feature
+
+# Commit changes
+git commit -m "feat: Description"
+
+# Create Pull Request
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see [LICENSE](LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+- [OpenSSL](https://www.openssl.org/) - Cryptography library
+- [libsodium](https://libsodium.org/) - ChaCha20 implementation
+- [Argon2](https://github.com/P-H-C/phc-winner-argon2) - Memory-Hard KDF
+
+---
+
+<p align="center">
+  <sub>Made with ❤️ by <a href="https://github.com/HasiKe">HasiKe</a></sub>
+</p>

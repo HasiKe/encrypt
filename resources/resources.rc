@@ -1,45 +1,62 @@
+// Windows Resource Script for Encrypt
+// Defines application icon, version info, and manifest
+
 #include <windows.h>
 
-// Passwort-Dialog Definition
-102 DIALOG 0, 0, 210, 120
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Passwort eingeben"
-FONT 8, "MS Shell Dlg"
+//=============================================================================
+// Version Information
+//=============================================================================
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION 2,0,0,0
+    PRODUCTVERSION 2,0,0,0
+    FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+    FILEFLAGS 0x0L
+    FILEOS VOS_NT_WINDOWS32
+    FILETYPE VFT_APP
+    FILESUBTYPE VFT2_UNKNOWN
 BEGIN
-    LTEXT           "Bitte geben Sie ein Passwort ein:", -1, 10, 10, 190, 8
-    EDITTEXT        101, 10, 25, 190, 14, ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "Passwort bestätigen:", -1, 10, 45, 190, 8
-    EDITTEXT        102, 10, 60, 190, 14, ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK", IDOK, 40, 90, 50, 14
-    PUSHBUTTON      "Abbrechen", IDCANCEL, 120, 90, 50, 14
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "HasiKe"
+            VALUE "FileDescription", "Military-grade File Encryption Tool"
+            VALUE "FileVersion", "2.0.0.0"
+            VALUE "InternalName", "encrypt"
+            VALUE "LegalCopyright", "Copyright (c) 2026 HasiKe. MIT License."
+            VALUE "OriginalFilename", "encrypt.exe"
+            VALUE "ProductName", "Encrypt"
+            VALUE "ProductVersion", "2.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
 END
 
-// Sicherheitsstufen-Dialog Definition
-201 DIALOG 0, 0, 250, 200
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Sicherheitsstufe wählen"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "Bitte wählen Sie eine Sicherheitsstufe:", -1, 10, 10, 230, 8
-    
-    RADIOBUTTON     "Stufe 1: Schnell (AES-128, PBKDF2 mit 10.000 Iterationen)", 202, 10, 30, 230, 12
-    LTEXT           "Geeignet für unkritische Daten, schnelle Verarbeitung.", -1, 30, 45, 210, 8
-    
-    RADIOBUTTON     "Stufe 2: Standard (AES-256, PBKDF2 mit 100.000 Iterationen)", 203, 10, 60, 230, 12
-    LTEXT           "Gute Balance zwischen Sicherheit und Geschwindigkeit.", -1, 30, 75, 210, 8
-    
-    RADIOBUTTON     "Stufe 3: Erhöhte Sicherheit (AES-256, PBKDF2 mit 250.000 Iterationen)", 204, 10, 90, 230, 12
-    LTEXT           "Höhere Sicherheit, langsamere Verarbeitung.", -1, 30, 105, 210, 8
-    
-    RADIOBUTTON     "Stufe 4: Hohe Sicherheit (AES-256, Argon2id mit 64MB RAM)", 205, 10, 120, 230, 12
-    LTEXT           "Hohe Sicherheit, deutlich langsamere Verarbeitung.", -1, 30, 135, 210, 8
-    
-    RADIOBUTTON     "Stufe 5: Maximale Sicherheit (AES-256+ChaCha20, Argon2id mit 256MB)", 206, 10, 150, 230, 12
-    LTEXT           "Maximale Sicherheit, sehr langsame Verarbeitung.", -1, 30, 165, 210, 8
-    
-    DEFPUSHBUTTON   "OK", IDOK, 60, 180, 50, 14
-    PUSHBUTTON      "Abbrechen", IDCANCEL, 140, 180, 50, 14
-END
+//=============================================================================
+// Application Icon
+//=============================================================================
 
-// Icon Definition (wird später erstellt)
-// 1 ICON "icon.ico"
+// Main application icon (use default if no icon file exists)
+// IDI_ICON1 ICON "encrypt.ico"
+
+//=============================================================================
+// Application Manifest
+//=============================================================================
+
+// Enable visual styles and DPI awareness
+1 RT_MANIFEST "encrypt.manifest"
+
+//=============================================================================
+// String Table
+//=============================================================================
+
+STRINGTABLE
+BEGIN
+    1 "Encrypt"
+    2 "Military-grade File Encryption Tool"
+    3 "2.0.0"
+END
