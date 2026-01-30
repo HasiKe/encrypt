@@ -11,6 +11,7 @@
 #include "encrypt/platform.h"
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <cstring>
 #include <sys/stat.h>
 #include <sys/types.h>

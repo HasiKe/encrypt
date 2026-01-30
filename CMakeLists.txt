@@ -83,16 +83,21 @@ set(CORE_SOURCES
     src/core/crypto.cpp
 )
 
+# Platform-specific utility sources for core library
+if(BUILD_WINDOWS)
+    set(PLATFORM_CORE_SOURCES src/platform/windows.cpp)
+else()
+    set(PLATFORM_CORE_SOURCES src/platform/linux.cpp)
+endif()
+
 set(LINUX_SOURCES
     src/main.cpp
     src/ui/cli.cpp
-    src/platform/linux.cpp
 )
 
 set(WINDOWS_SOURCES
     src/main.cpp
     src/ui/cli.cpp
-    src/platform/windows.cpp
 )
 
 set(HEADERS
@@ -104,7 +109,7 @@ set(HEADERS
 # Core Library
 #-------------------------------------------------------------------------------
 
-add_library(encrypt_core STATIC ${CORE_SOURCES} ${HEADERS})
+add_library(encrypt_core STATIC ${CORE_SOURCES} ${PLATFORM_CORE_SOURCES} ${HEADERS})
 
 target_include_directories(encrypt_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
